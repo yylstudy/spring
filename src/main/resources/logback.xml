@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- scan 当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true。 -->
+<!-- scanPeriod 设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。 -->
+<!-- debug 当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <!-- 动态日志级别 -->
+    <jmxConfigurator/>
+    <!-- 定义日志文件 输出位置 -->
+    <property name="log.home_dir" value="D:/spring5/log"/>
+    <!-- ConsoleAppender 控制台输出日志 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                <!-- 设置日志输出格式 -->
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%thread] %logger - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- ERROR级别日志 -->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.home_dir}/error.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 设置过滤级别 -->
+            <level>ERROR</level>
+            <!-- 用于配置符合过滤条件的操作 -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 用于配置不符合过滤条件的操作 -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <!-- 最常用的滚动策略，它根据时间来制定滚动策略.既负责滚动也负责触发滚动 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志输出位置 可相对、和绝对路径 -->
+            <fileNamePattern>
+                ${log.home_dir}/error_%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+            <maxFileSize>100MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>
+                <!-- 设置日志输出格式 -->
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n
+            </pattern>
+            <charset>utf-8</charset>
+        </encoder>
+    </appender>
+
+
+    <!-- WARN级别日志 appender -->
+    <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.home_dir}/warn.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 设置过滤级别 -->
+            <level>WARN</level>
+            <!-- 用于配置符合过滤条件的操作，也就是接收warn级别的日志 -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 用于配置不符合过滤条件的操作，也就是拒绝非debug级别的日志 -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志输出位置 可相对、和绝对路径 -->
+            <fileNamePattern>${log.home_dir}/warn_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+            <maxFileSize>100MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+    </appender>
+    <!-- 总日志 appender -->
+    <appender name="spring5" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.home_dir}/spring5.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.home_dir}/spring5_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+            <maxFileSize>100MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %logger - %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+    </appender>
+    <!-- toStringBeanPostProcessor appender -->
+    <appender name="toStringBeanPostProcessor" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.home_dir}/stringBeanPostProcessor.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.home_dir}/stringBeanPostProcessor_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+            <maxFileSize>100MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %logger - %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+    </appender>
+
+    <!--org.springframework包下的类的日志输出debug级别的到指定文件以及控制台，如果觉得spring日志太多可以只打印info级别的-->
+    <logger name="org.springframework" level="info" additivity="false">
+        <appender-ref ref="spring5"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <!--com.yyl.extend.ToStringBeanPostProcessor类的日志输出debug级别的到指定文件以及控制台-->
+    <logger name="com.yyl.extend.ToStringBeanPostProcessor" level="debug" additivity="false">
+        <appender-ref ref="toStringBeanPostProcessor"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <root>
+        <!-- 打印debug级别日志及以上级别日志 -->
+        <level value="debug"/>
+        <!-- 控制台输出 -->
+        <appender-ref ref="spring5"/>
+        <appender-ref ref="WARN"/>
+        <appender-ref ref="ERROR"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

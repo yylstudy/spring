@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        ">
+    <bean id="MSDataSource1" class="com.atomikos.jdbc.AtomikosDataSourceBean"
+          init-method="init" destroy-method="close">
+        <property name="uniqueResourceName"><value>ms1</value></property>
+        <property name="xaDataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" />
+        <property name="xaProperties">
+            <props>
+                <prop key="user">root</prop>
+                <prop key="password">root</prop>
+                <prop key="url">jdbc:mysql://localhost:3306/ds_slave0</prop>
+            </props>
+        </property>
+        <!-- set properties for datasource connection pool -->
+        <property name="poolSize" value="3" />
+        <!-- 管理 Connection 被占用的时间 -->
+        <!-- 如果不设置这个值，Atomikos使用默认的300秒(即5分钟)，那么在处理大批量数据读取的时候，一旦超过5分钟，就会抛出类似 Resultset is close 的错误 -->
+        <property name="reapTimeout"><value>20000</value></property>
+    </bean>
+
+    <bean id="MSDataSource2" class="com.atomikos.jdbc.AtomikosDataSourceBean"
+          init-method="init" destroy-method="close">
+        <property name="uniqueResourceName"><value>ms2</value></property>
+        <property name="xaDataSourceClassName" value="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" />
+        <property name="xaProperties">
+            <props>
+                <prop key="user">root</prop>
+                <prop key="password">root</prop>
+                <prop key="url">jdbc:mysql://localhost:3306/ds_slave1</prop>
+            </props>
+        </property>
+        <!-- set properties for datasource connection pool -->
+        <property name="poolSize" value="3" />
+        <!-- 管理 Connection 被占用的时间 -->
+        <!-- 如果不设置这个值，Atomikos使用默认的300秒(即5分钟)，那么在处理大批量数据读取的时候，一旦超过5分钟，就会抛出类似 Resultset is close 的错误 -->
+        <property name="reapTimeout"><value>20000</value></property>
+    </bean>
+
+    <bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager"
+          init-method="init" destroy-method="close">
+        <property name="forceShutdown">
+            <value>true</value>
+        </property>
+    </bean>
+
+    <bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.UserTransactionImp">
+        <property name="transactionTimeout" value="300" />
+    </bean>
+
+    <!-- spring 事务管理器 -->
+    <bean id="springTransactionManager"
+          class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="transactionManager" ref="atomikosTransactionManager"/>
+        <property name="userTransaction" ref="atomikosUserTransaction" />
+        <property name="allowCustomIsolationLevels" value="true"/>
+    </bean>
+</beans>

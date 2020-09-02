@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans profile="" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:master-slave="http://shardingsphere.io/schema/shardingsphere/masterslave"
+       xmlns:sharding="http://shardingsphere.io/schema/shardingsphere/sharding"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://shardingsphere.io/schema/shardingsphere/masterslave
+        http://shardingsphere.io/schema/shardingsphere/masterslave/master-slave.xsd
+        http://shardingsphere.io/schema/shardingsphere/sharding
+        http://shardingsphere.io/schema/shardingsphere/sharding/sharding.xsd
+		">
+    <bean id="db_master_1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/db_master_1" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+    <bean id="db_master_1_slave_0" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/db_master_1_slave_0" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+    <bean id="db_master_1_slave_1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/db_master_1_slave_1" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+
+    <!--这里需要注意一点的是sharding-jdbc不允许spring再去定义<context:property-placeholder/>-->
+    <!--也就是读取配置文件的配置类，若是想使用，必须要把sharding-jdbc的<context:property-placeholder/>删除
+    因为spring中允许最多定义一个PropertyPlaceholderConfigurer
+    -->
+    <bean id="db_master_2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/db_master_2" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+    <bean id="db_master_2_slave_0" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/db_master_2_slave_0" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+    <bean id="db_master_2_slave_1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/db_master_2_slave_1" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+    <bean id="randomStrategy" class="io.shardingsphere.api.algorithm.masterslave.RandomMasterSlaveLoadBalanceAlgorithm" />
+
+    <!--分库规则 根据user_id分库  precise-algorithm-ref 这个表示精确分片算法
+     、用于等于或者in，range-algorithm-ref 表示范围分片算法用于 between-->
+    <sharding:standard-strategy id="databaseShardingStrategy" sharding-column="user_id" precise-algorithm-ref="preciseModuloDatabaseShardingAlgorithm" />
+    <!--分表规则 根据order_id分表-->
+    <sharding:standard-strategy id="tableShardingStrategy" sharding-column="order_id" precise-algorithm-ref="preciseModuloTableShardingAlgorithm" />
+    <!--分库实现-->
+    <bean id="preciseModuloDatabaseShardingAlgorithm" class="com.shardingjdbc.rule.ModuloShardingDatabaseAlgorithm" />
+    <!--分表实现-->
+    <bean id="preciseModuloTableShardingAlgorithm" class="com.shardingjdbc.rule.ModuloShardingTableAlgorithm" />
+
+    <bean id="order_key_generator" class="io.shardingsphere.core.keygen.DefaultKeyGenerator"/>
+    <sharding:data-source id="realShardingDatabasesDataSource">
+        <sharding:props>
+            <prop key="sql.show">true</prop>
+        </sharding:props>
+        <sharding:sharding-rule data-source-names="db_master_1,db_master_2,db_master_1_slave_0,db_master_1_slave_1,db_master_2_slave_0,db_master_2_slave_1">
+            <!--这里xml校验为什么会报错，但其实是可以的，没搞懂-->
+            <sharding:master-slave-rules>
+                <sharding:master-slave-rule id="ds_ms0" master-data-source-name="db_master_1" slave-data-source-names="db_master_1_slave_0, db_master_1_slave_1" strategy-ref="randomStrategy"/>
+                <sharding:master-slave-rule id="ds_ms1" master-data-source-name="db_master_2" slave-data-source-names="db_master_2_slave_0, db_master_2_slave_1" strategy-ref="randomStrategy"/>
+            </sharding:master-slave-rules>
+            <sharding:table-rules>
+                <!--generate-key-column-name 这个应该只是表示主键名称  database-strategy-ref表示分库规则
+                  table-strategy-ref表示分表规则
+                  -->
+                <sharding:table-rule  logic-table="t_order" actual-data-nodes="ds_ms${0..1}.t_order${0..1}"
+                                     database-strategy-ref="databaseShardingStrategy"
+                                     table-strategy-ref="tableShardingStrategy" generate-key-column-name="order_id" />
+                <sharding:table-rule logic-table="t_order_item" actual-data-nodes="ds_ms${0..1}.t_order_item${0..1}"
+                                     database-strategy-ref="databaseShardingStrategy"
+                                     table-strategy-ref="tableShardingStrategy" generate-key-column-name="item_id" />
+            </sharding:table-rules>
+            <!--绑定规则，这个是减少表join的数据集，也就是表关联的时候只关联同个分片库的数据，
+            但是这要求这两个表的分区键要完全相同，分区的算法也完全一致-->
+            <sharding:binding-table-rules>
+                <sharding:binding-table-rule logic-tables="t_order,t_order_item"/>
+            </sharding:binding-table-rules>
+        </sharding:sharding-rule>
+    </sharding:data-source>
+
+</beans>

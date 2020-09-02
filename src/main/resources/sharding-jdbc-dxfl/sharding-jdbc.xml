@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans profile="" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:master-slave="http://shardingsphere.io/schema/shardingsphere/masterslave"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://shardingsphere.io/schema/shardingsphere/masterslave
+        http://shardingsphere.io/schema/shardingsphere/masterslave/master-slave.xsd
+		">
+    <bean id="ds_master" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/ds_master" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+
+    <bean id="ds_slave0" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/ds_slave0" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+
+    <bean id="ds_slave1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/ds_slave1" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+    <bean id="randomStrategy" class="io.shardingsphere.api.algorithm.masterslave.RandomMasterSlaveLoadBalanceAlgorithm" />
+
+    <master-slave:data-source id="realMasterSlaveDataSource" master-data-source-name="ds_master"
+                              slave-data-source-names="ds_slave0, ds_slave1"
+                              strategy-ref="randomStrategy">
+        <master-slave:props>
+            <!--是否开启sql显示，默认为false-->
+            <prop key="sql.show">true</prop>
+        </master-slave:props>
+    </master-slave:data-source>
+</beans>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+<!--    xml中引入properties文件 此文件的顺序是无所谓的，因为后面解析${}是在解析property-placeholer
+        对应的BeanFactoryPostProcessor的时候做的-->
+    <context:property-placeholder  location="classpath*:propertyPlaceHolder.properties"/>
+
+<!--    spring事务配置开始-->
+<!--    <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"/>-->
+<!--    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+<!--        <property name="dataSource" ref="datasource"/>-->
+<!--    </bean>-->
+<!--    <bean id="datasource" class="com.alibaba.druid.pool.DruidDataSource">-->
+<!--        <property name="driverClassName" value="com.mysql.jdbc.Driver" />-->
+<!--        <property name="url" value="jdbc:mysql://localhost:3306/spring" />-->
+<!--        <property name="username" value="root" />-->
+<!--        <property name="password" value="root" />-->
+<!--    </bean>-->
+<!--    spring事务配置结束-->
+    <import resource="mybatis.xml"/>
+    <bean id="myBean" class="com.yyl.service.PropertyPlaceholderBean">
+        <property name="name" value="${spring.username}"/>
+        <property name="age" value="${spring.age}"/>
+    </bean>
+
+<!--    开启aop-->
+        <!--<aop:aspectj-autoproxy />-->
+<!--    指定扫描包名，并指定beanName生成器-->
+    <context:component-scan base-package="com.yyl" name-generator="com.yyl.config.spring.MyBeanNameGenerator"
+     >
+<!--        添加包含的注解-->
+        <context:include-filter type="annotation" expression="com.yyl.annotation.IncludeAnnotation"/>
+<!--        添加排除的注解-->
+        <context:exclude-filter type="annotation" expression="com.yyl.annotation.ExcludeAnnotation"/>
+    </context:component-scan>
+
+    <!--<mvc:annotation-driven >-->
+        <!--<mvc:argument-resolvers>-->
+            <!--<bean class="com.yyl.config.spring.MyHandlerMethodArgumentResolver"/>-->
+        <!--</mvc:argument-resolvers>-->
+        <!--<mvc:return-value-handlers>-->
+            <!--<bean class="com.yyl.config.spring.MyHandlerMethodReturnValueHandler"/>-->
+        <!--</mvc:return-value-handlers>-->
+    <!--</mvc:annotation-driven>-->
+    <!--<mvc:interceptors >-->
+        <!--<mvc:interceptor>-->
+            <!--<mvc:mapping path="/*"/>-->
+            <!--<bean class="com.yyl.config.spring.MyInterceptor"/>-->
+        <!--</mvc:interceptor>-->
+    <!--</mvc:interceptors>-->
+
+</beans>

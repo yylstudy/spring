@@ -1,0 +1,57 @@
+-----ACCT_BALANCE-----
+表头:acct_balance_id（条件，必填）|balance_type_id(改后余额类型ID)|eff_date(改后生效时间)|exp_date(改后失效时间)|balance（改后余额）|need_invoice_amount(改后待打发票金额)
+acct_balance_id|balance_type_id(余额类型ID)|eff_date(生效时间)|exp_date(失效时间)|balance（余额）|need_invoice_amount(待打发票金额)
+acct_balance_id|balance_type_id(余额类型ID)|eff_date(生效时间)|exp_date(失效时间)|balance（余额）|need_invoice_amount(待打发票金额)
+
+
+-----ACCT_BALANCE_QUOTA-----
+表头:acct_balance_id（条件，必填）|billing_cycle_id（条件，必填）|cycle_upper（改后最高扣费限额）|cycle_lower（改后最低扣费限额）
+acct_balance_id|billing_cycle_id|cycle_upper（最高扣费限额）|cycle_lower（最低扣费限额）
+acct_balance_id|billing_cycle_id|cycle_upper（最高扣费限额）|cycle_lower（最低扣费限额）
+
+
+---------BALANCE_SHARE_RULE---------
+表头:acct_balance_id（条件，必填）|share_rule_id（条件，必填）|eff_date(改后生效时间)|exp_date（改后失效时间）
+acct_balance_id|share_rule_id|eff_date(生效时间)|exp_date（失效时间）
+acct_balance_id|share_rule_id|eff_date(生效时间)|exp_date（失效时间）
+
+
+---------SERV_STATE_ATTR---------
+表头:serv_state_attr_id（条件，必填）|state（状态）|eff_date(改后生效时间)|exp_date（改后失效时间）
+serv_state_attr_id|state|eff_date(生效时间)|exp_date（失效时间）
+serv_state_attr_id|state|eff_date(生效时间)|exp_date（失效时间）
+
+---------CREDIT_LIMIT---------
+表头:credit_limit_id（条件，必填）|credit_limit_fee （改后信用额度）|status_cd（状态）|eff_date(改后生效时间)|exp_date（改后失效时间）
+credit_limit_id|credit_limit_fee|status_cd（状态）|eff_date(生效时间)|exp_date（失效时间）
+credit_limit_id|credit_limit_fee|status_cd（状态）|eff_date(生效时间)|exp_date（失效时间）
+
+
+---------ACCUMULATOR---------
+表头:accu_id（条件，必填）|init_val （量本初始值）|accu_val（量本值）|peak_value(峰值)|eff_date(改后生效时间)|exp_date（改后失效时间）
+accu_id|init_val|accu_val|peak_value|eff_date(生效时间)|exp_date（失效时间）
+accu_id|init_val|accu_val|peak_value|eff_date(生效时间)|exp_date（失效时间）
+
+
+---------PROD_INST_ACCU_USE_I_帐期/ PROD_INST_ACCU_USE_I_uni---------
+表头:accu_use_id（条件，必填）|billing_cycle_id（条件，必填）|usage_amount（使用量）|carryover_amount(往月结转量)|charge(费用)|include_value(套餐包含量)|eff_date(改后生效时间)|exp_date（改后失效时间）
+accu_use_id|billing_cycle_id|usage_amount|carryover_amount|charge|include_value|eff_date(生效时间)|exp_date（失效时间）
+accu_use_id|billing_cycle_id|usage_amount|carryover_amount|charge|include_value|eff_date(生效时间)|exp_date（失效时间）
+
+---------ACCT_ITEM_SD_$账期标识---------
+表头:acct_item_id（条件，必填）|billing_cycle_id（条件，必填）|acct_id|acct_item_type_id|partition_item_type|old_charge|disct_charge|charge|partition_charge|balance_paid|present_amount|had_invoice_amount
+acct_item_id|billing_cycle_id|acct_id|acct_item_type_id|partition_item_type|old_charge|disct_charge|charge|partition_charge|balance_paid|present_amount|had_invoice_amount
+acct_item_id|billing_cycle_id|acct_id|acct_item_type_id|partition_item_type|old_charge|disct_charge|charge|partition_charge|balance_paid|present_amount|had_invoice_amount
+
+---------ACCT_ITEM_OWE_$账期标识---------
+表头:acct_item_id（条件，必填）|billing_cycle_id（条件，必填）|status_cd（状态）
+acct_item_id|billing_cycle_id|status_cd
+acct_item_id|billing_cycle_id|status_cd
+
+
+
+注意：
+1.时间格式统一：yyyy-MM-dd HH:mm:ss
+2.上传文件时请加上表头字样那一行
+3.金额的单位为元
+4.所有字段值都是改后值
