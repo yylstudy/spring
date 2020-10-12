@@ -119,6 +119,7 @@ public class MyTest1 {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
         UserService userService = applicationContext.getBean(UserService.class);
         userService.insertByJdbcTemplate();
+        userService.insertByMybatis();
     }
     /**
      * mybatis分页查询
